@@ -2,8 +2,6 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
-use App\Http\Controllers\ExampleController;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -19,7 +17,23 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->get('/test',  'ExampleController@test');
+$router->get('/datas', 'ExampleController@index' );
 
-$router->get('/check-connection', 'ExampleController@index');
-$router->post('/check-post', 'ExampleController@store');
+$router->group(['prefix' => 'api',], function () use ($router) {
+    $router->group(['middleware' => 'auth'], function () use ($router) {   
+        $router->group(['prefix'=> 'admin'], function () use ($router) {
+            $router->get('/',  ['uses' => 'AdminController@showAllDatas']);
+            
+            $router->get('/{id}', ['uses' => 'AdminController@showOneData']);
+            
+            $router->post('/', ['uses' => 'AdminController@create']);
+            
+            $router->delete('/{id}', ['uses' => 'AdminController@delete']);
+            
+            $router->put('/{id}', ['uses' => 'AdminController@update']);
+        });    
+        $router->post('/logout', ['uses' => 'AuthController@logout']);
+    });
+
+    $router->post('/login', ['uses' => 'AuthController@login']);
+  });
