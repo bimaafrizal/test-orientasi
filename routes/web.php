@@ -36,4 +36,7 @@ $router->group(['prefix' => 'api',], function () use ($router) {
     });
 
     $router->post('/login', ['uses' => 'AuthController@login']);
+    $router->post('/send-message', ['uses' => 'Admincontroller@cobaPublisher']);
+    $router->get('/receiver-message', ['uses' => 'Admincontroller@reciver']);
   });
+
