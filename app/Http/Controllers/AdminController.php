@@ -7,9 +7,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class AdminController extends Controller
 {
+    private $connection;
+    private $channel;
+    
+    public function __construct() {
+        $this->connection = new AMQPStreamConnection(
+            env('RABBITMQ_HOST'),
+            env('RABBITMQ_PORT'),
+            env('RABBITMQ_LOGIN'),
+            env('RABBITMQ_PASSWORD'),
+            env('RABBITMQ_VHOST')
+        );
+        $this->channel = $this->connection->channel();
+    }
+    public function __destruct() {
+        $this->channel->close();
+        $this->connection->close();
+    }
+    
     public function showAllDatas()
     {
         return response()->json([
@@ -99,46 +118,17 @@ class AdminController extends Controller
     }
 
     public function cobaPublisher() {
-        $connection = new AMQPStreamConnection(
-            env('RABBITMQ_HOST'),
-            env('RABBITMQ_PORT'),
-            env('RABBITMQ_LOGIN'),
-            env('RABBITMQ_PASSWORD'),
-            env('RABBITMQ_VHOST')
-        );
-        $channel = $connection->channel();
-
-        $channel->queue_declare('hello', false, false, false, false);
-
-        $msg = new \PhpAmqpLib\Message\AMQPMessage('Hello World!');
-        $channel->basic_publish($msg, '', 'hello');
-
-        $channel->close();
-        $connection->close();
+        $msg = new AMQPMessage('Hello World coba lagi jam 4!');
+        $this->channel->exchange_declare(env('RABBITMQ_EXCHANGE'), 'direct', false, false, false);
+        $this->channel->basic_publish($msg, env('RABBITMQ_EXCHANGE'), env('RABBITMQ_ROUTING_KEY'));
+        
+        return response()->json([
+            'code' => 200,
+            'message' => 'successufully publish data',
+            'data' => []]);
     }
 
     public function reciver() {
-        $connection = new AMQPStreamConnection(
-            env('RABBITMQ_HOST'),
-            env('RABBITMQ_PORT'),
-            env('RABBITMQ_LOGIN'),
-            env('RABBITMQ_PASSWORD'),
-            env('RABBITMQ_VHOST')
-        );
-        $channel = $connection->channel();
 
-        $channel->queue_declare('hello', false, false, false, false);
-
-        echo " [*] Waiting for messages. To exit press CTRL+C\n";
-
-        $callback = function ($msg) {
-            echo ' [x] Received ', $msg->body, "\n";
-        };
-
-        $channel->basic_consume('hello', '', false, true, false, false, $callback);
-
-        while ($channel->is_consuming()) {
-            $channel->wait();
-        }
     }
 }

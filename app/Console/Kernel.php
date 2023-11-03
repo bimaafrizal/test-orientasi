@@ -14,6 +14,10 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \Illuminate\Console\KeyGenerateCommand::class,
+        \App\Console\Commands\InputAdminCommand::class,
+        \App\Console\Commands\ReciverRabbitMQCommand::class,
+        \App\Console\Commands\PublisherInputRabbitMQCommand::class,
+        \App\Console\Commands\ReceiverInputRabbitMQCommand::class,
     ];
 
     /**
@@ -24,6 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        // $schedule->command("input-admin:corn")->everyMinute()->appendOutputTo(storage_path('logs/cron.log'));
+        $schedule->command('rabbitmq:publish')->everyMinute();
     }
 }
