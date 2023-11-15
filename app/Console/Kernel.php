@@ -14,10 +14,11 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \Illuminate\Console\KeyGenerateCommand::class,
-        \App\Console\Commands\InputAdminCommand::class,
-        \App\Console\Commands\ReciverRabbitMQCommand::class,
-        \App\Console\Commands\PublisherInputRabbitMQCommand::class,
-        \App\Console\Commands\ReceiverInputRabbitMQCommand::class,
+        // \App\Console\Commands\InputAdminCommand::class,
+        // \App\Console\Commands\ReciverRabbitMQCommand::class,
+        // \App\Console\Commands\PublisherInputRabbitMQCommand::class,
+        // \App\Console\Commands\ReceiverInputRabbitMQCommand::class,
+        \App\Console\Commands\ReceiverOtherServiceCommand::class,
     ];
 
     /**
